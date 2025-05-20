@@ -142,6 +142,14 @@ const config = {
         "fromEnvVar": null,
         "value": "debian-openssl-3.0.x",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "debian-openssl-3.0.x"
+      },
+      {
+        "fromEnvVar": null,
+        "value": "linux-musl-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -168,8 +176,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum HealthStatus {\n  Healthy\n  Sick\n  Critical\n}\n\nmodel Records {\n  id         String       @id @default(uuid())\n  createdAt  DateTime     @default(now())\n  name       String\n  age        Int\n  status     HealthStatus\n  last_pdate DateTime     @updatedAt\n}\n",
-  "inlineSchemaHash": "d32f987a68403b9c144432099affa89e3d26cd7a4acf60c5085ed1cff6f592d7",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/prisma\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\", \"linux-musl-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum HealthStatus {\n  Healthy\n  Sick\n  Critical\n}\n\nmodel Records {\n  id         String       @id @default(uuid())\n  createdAt  DateTime     @default(now())\n  name       String\n  age        Int\n  status     HealthStatus\n  last_pdate DateTime     @updatedAt\n}\n",
+  "inlineSchemaHash": "e171197ced17b2852c1fbd212703aac42212f87efb078848b79e707beb0cd038",
   "copyEngine": true
 }
 
@@ -210,6 +218,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
 path.join(process.cwd(), "src/generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-linux-musl-openssl-3.0.x.so.node");
+path.join(process.cwd(), "src/generated/prisma/libquery_engine-linux-musl-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "src/generated/prisma/schema.prisma")
