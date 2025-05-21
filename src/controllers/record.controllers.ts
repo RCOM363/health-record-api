@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import prisma from "../db/prismaClient.js";
 import redis from "../db/redisClient.js";
 import { publishMessage } from "../queue/publisher.js";
+import { broadcastMessage } from "../websocket/notificationServer.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const createHealthRecord = expressAsyncHandler(
@@ -22,6 +23,7 @@ export const createHealthRecord = expressAsyncHandler(
     }
 
     await publishMessage(`Added Record: ${record.id}`);
+    broadcastMessage(`Added Record: ${record.id}`);
 
     res.status(201).json({ message: "Record added successfully", record });
   },
@@ -81,6 +83,7 @@ export const updateHealthRecord = expressAsyncHandler(
     }
 
     await publishMessage(`Updated Record: ${updatedRecord.id}`);
+    broadcastMessage(`Updated Record: ${updatedRecord.id}`);
 
     res.status(200).json({ message: "Record updated successfully", record });
   },

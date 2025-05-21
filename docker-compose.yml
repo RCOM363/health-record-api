@@ -15,7 +15,7 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
-  backend-server:
+  health-record-api:
     build:
       context: ./
       dockerfile: Dockerfile
