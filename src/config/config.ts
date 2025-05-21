@@ -7,6 +7,7 @@ interface Config {
   corsOrigin: string;
   databaseUrl: string;
   redisUrl: string;
+  rabbitmqUrl: string;
   tokenSecret: string;
 }
 
@@ -15,6 +16,7 @@ const config: Config = {
   corsOrigin: process.env.CORS_ORIGIN!,
   databaseUrl: process.env.DATABASE_URL!,
   redisUrl: process.env.REDIS_URL!,
+  rabbitmqUrl: process.env.RABBITMQ_URL!,
   tokenSecret: process.env.TOKEN_SECRET!,
 };
 
