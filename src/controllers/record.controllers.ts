@@ -5,6 +5,7 @@ import prisma from "../db/prismaClient.js";
 import redis from "../db/redisClient.js";
 import { publishMessage } from "../queue/publisher.js";
 import { broadcastMessage } from "../websocket/notificationServer.js";
+import { sendHealthUpdates } from "../routes/sse.routes.js";
 import { ApiError } from "../utils/ApiError.js";
 
 export const createHealthRecord = expressAsyncHandler(
@@ -22,8 +23,14 @@ export const createHealthRecord = expressAsyncHandler(
       throw new ApiError(500, "Error while creating a record");
     }
 
+    // add message to queue
     await publishMessage(`Added Record: ${record.id}`);
+
+    // broadcast using websocket
     broadcastMessage(`Added Record: ${record.id}`);
+
+    // stream using sse
+    sendHealthUpdates(`Added Record: ${record.id}`);
 
     res.status(201).json({ message: "Record added successfully", record });
   },
@@ -82,8 +89,14 @@ export const updateHealthRecord = expressAsyncHandler(
       throw new ApiError(500, "Something went wrong while updating the record");
     }
 
+    // add message to queue
     await publishMessage(`Updated Record: ${updatedRecord.id}`);
+
+    // broadcast using websocket
     broadcastMessage(`Updated Record: ${updatedRecord.id}`);
+
+    // stream using sse
+    sendHealthUpdates(`Updated Record: ${updatedRecord.id}`);
 
     res.status(200).json({ message: "Record updated successfully", record });
   },
