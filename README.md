@@ -51,6 +51,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
    ```bash
    docker-compose up health-record-api
    ```
+   `NOTE`: You will get connection error with RabbitMQ but it will connect after few tries
 
 ## API Documentation
 
@@ -58,7 +59,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 
 - **URL** : `/api/v1/records`
 - **Method** : `POST`
-- **Body**
+- **Body** :
   ```json
   {
     "name": "John Doe",
@@ -66,27 +67,47 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
     "status": "Healthy"
   }
   ```
+- **CURL command** :
+  ```bash
+  curl -X POST http://localhost:PORT/api/v1/records \
+  -H "Content-Type: application/json" \
+  -d '{"name": "John Doe", "age": "25", "status": "Healthy"}'
+  ```
 
 ### Get a record
 
 - **URL** : `/api/v1/records/:id`
 - **Method** : `GET`
+- **CURL command** :
+  ```bash
+  curl http://localhost:PORT/api/v1/records/{id}
+  ```
 
 ### Update a record
 
 - **URL** : `/api/v1/records/:id`
 - **Method** : `PUT`
-- **Body**
+- **Body** :
   ```json
   {
     "age": 20
   }
+  ```
+- **CURL command** :
+  ```bash
+  curl -X POST http://localhost:PORT/api/v1/records/{id} \
+  -H "Content-Type: application/json" \
+  -d '{"age": "20"}'
   ```
 
 ### Delete a record
 
 - **URL** : `/api/v1/records/:id`
 - **Method** : `DELETE`
+- **CURL command** :
+  ```bash
+  curl -X DELETE http://localhost:PORT/api/v1/records/{id}
+  ```
 
 ## Websocket server
 
@@ -94,3 +115,10 @@ Connect to the websocket server
 
 - At `http://localhost:PORT/ws` on frontend or
 - Visit `https://hoppscotch.io/realtime/websocket` and add `ws://localhost:PORT/ws` as **URL** and hit connect
+
+## Server Sent Events
+
+Connect to the SSE at
+
+- `http://localhost:PORT/sse/health-updates` on frontend or
+- `curl http://localhost:PORT/sse/health-updates` on terminal
