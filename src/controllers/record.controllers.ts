@@ -114,6 +114,15 @@ export const deleteHealthRecord = expressAsyncHandler(
 
     await prisma.records.delete({ where: { id: req.params.id } });
 
+    // add message to queue
+    await publishMessage(`Deleted Record: ${record.id}`);
+
+    // broadcast using websocket
+    broadcastMessage(`Deleted Record: ${record.id}`);
+
+    // stream using sse
+    sendHealthUpdates(`Deleted Record: ${record.id}`);
+
     res.status(204).json({ message: "Record deleted successfully" });
   },
 );
