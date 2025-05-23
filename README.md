@@ -55,6 +55,24 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 
 ## API Documentation
 
+### Login
+
+- **URL** : `/api/v1/auth/login`
+- **Method** : `POST`
+- **Body** :
+  ```json
+  {
+    "email": "john@gmail.com",
+    "password": "pass#123"
+  }
+  ```
+- **CURL command** :
+  ```bash
+  curl -X POST http://localhost:PORT/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "john@gmail.com","password": "pass#123"}'
+  ```
+
 ### Create a record
 
 - **URL** : `/api/v1/records`
@@ -113,12 +131,27 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 
 Connect to the websocket server
 
-- At `http://localhost:PORT/ws` on frontend or
+- **Endpoint** : `http://localhost:PORT/ws`
 - Visit `https://hoppscotch.io/realtime/websocket` and add `ws://localhost:PORT/ws` as **URL** and hit connect
 
 ## Server Sent Events
 
 Connect to the SSE at
 
-- `http://localhost:PORT/sse/health-updates` on frontend or
-- `curl http://localhost:PORT/sse/health-updates` on terminal
+- **Endpoint** : `http://localhost:PORT/sse/health-updates`
+- Use `CURL` to test 
+  ```bash
+    curl http://localhost:PORT/sse/health-updates
+  ```
+
+## HTML Interface
+
+An HTML file (`public/test.html`) is included to manually test all API endpoints and real-time functionalities using WebSockets and SSE.
+
+## Project structure & Architectural decisions
+
+- Organized the code into separates modules (models, controllers, routes etc)
+- Created a separate Notification worker to consume the messages from the queue, keeping the processes decoupled
+- Used docker to isolate environments for Node.js server, Redis, RabbitMQ and Worker, each run in their own   container
+
+

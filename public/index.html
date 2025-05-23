@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Health Record Dashboard</title>
+  </head>
+  <body>
+    <h1>Health Record Management</h1>
+
+    <section>
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </section>
+
+    <section>
+      <h2>Create Record</h2>
+      <input type="text" id="name" placeholder="Name" />
+      <input type="number" id="age" placeholder="Age" />
+      <select id="create-status" required>
+        <option value="">Select Status</option>
+        <option value="Healthy">Healthy</option>
+        <option value="Sick">Sick</option>
+        <option value="Critical">Critical</option>
+      </select>
+      <button onclick="createRecord()">Create</button>
+    </section>
+
+    <section>
+      <h2>Get Record</h2>
+      <input type="text" id="getId" placeholder="Record ID" />
+      <button onclick="getRecord()">Get</button>
+      <pre id="getResult"></pre>
+    </section>
+
+    <section>
+      <h2>Update Record</h2>
+      <form id="update-form">
+        <input type="text" id="update-id" placeholder="Record ID" required />
+        <input type="text" id="update-name" placeholder="Name" />
+        <input type="number" id="update-age" placeholder="Age" />
+        <select id="update-status">
+          <option value="">Select Status</option>
+          <option value="Healthy">Healthy</option>
+          <option value="Sick">Sick</option>
+          <option value="Critical">Critical</option>
+        </select>
+        <button type="submit">Update</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Delete Record</h2>
+      <input type="text" id="deleteId" placeholder="Record ID" />
+      <button onclick="deleteRecord()">Delete</button>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>WebSocket Messages</h2>
+      <ul id="wsMessages"></ul>
+    </section>
+
+    <section>
+      <h2>SSE Messages</h2>
+      <ul id="sseMessages"></ul>
+    </section>
+
+    <script>
+      const PORT = 3000;
+      const BASE_URL = `http://localhost:${PORT}/api/v1`;
+
+      async function login() {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        const res = await fetch(`${BASE_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        console.log("Created Record: ", data);
+        alert("Created: " + JSON.stringify(data));
+      }
+
+      async function createRecord() {
+        const name = document.getElementById("name").value;
+        const age = document.getElementById("age").value;
+        const status = document.getElementById("create-status").value;
+
+        const res = await fetch(`${BASE_URL}/records`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, age, status }),
+        });
+        const data = await res.json();
+        console.log("Created Record: ", data);
+        alert("Created: " + JSON.stringify(data));
+      }
+
+      async function getRecord() {
+        const id = document.getElementById("getId").value;
+        const res = await fetch(`${BASE_URL}/records/${id}`);
+        const data = await res.json();
+        document.getElementById("getResult").innerText = JSON.stringify(
+          data,
+          null,
+          2,
+        );
+      }
+
+      document
+        .getElementById("update-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault(); // Prevent page reload
+
+          const id = document.getElementById("update-id").value;
+          const name = document.getElementById("update-name").value;
+          const age = document.getElementById("update-age").value;
+          const status = document.getElementById("update-status").value;
+
+          const updateData = {};
+          if (name.trim()) updateData.name = name;
+          if (age.trim()) updateData.age = Number(age);
+          if (status.trim()) updateData.status = status;
+
+          const res = await fetch(`${BASE_URL}/records/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updateData),
+          });
+
+          const data = await res.json();
+          console.log("Updated Record: ", data);
+          alert("Updated: " + JSON.stringify(data));
+        });
+
+      async function deleteRecord() {
+        const id = document.getElementById("deleteId").value;
+
+        const res = await fetch(`${BASE_URL}/records/${id}`, {
+          method: "DELETE",
+        });
+
+        if (res.ok) {
+          alert(`Deleted record with ID: ${id}`);
+        } else {
+          alert("Error deleting record");
+        }
+      }
+
+      // Connect WebSocket
+      const ws = new WebSocket(`ws://localhost:${PORT}/ws`);
+
+      ws.onopen = () => {
+        console.log("Connected to Websocket");
+      };
+
+      ws.onmessage = (event) => {
+        console.log(event);
+        const li = document.createElement("li");
+        li.textContent = event.data;
+        document.getElementById("wsMessages").appendChild(li);
+      };
+
+      // Connect SSE
+      const sse = new EventSource(
+        `http://localhost:${PORT}/sse/health-updates`,
+      );
+
+      sse.onopen = () => {
+        console.log("Connected SSE");
+      };
+
+      sse.onerror = (err) => {
+        console.error("SSE error:", err);
+      };
+
+      sse.onmessage = (event) => {
+        console.log(event);
+        const li = document.createElement("li");
+        li.textContent = event.data;
+        document.getElementById("sseMessages").appendChild(li);
+      };
+    </script>
+  </body>
+</html>
