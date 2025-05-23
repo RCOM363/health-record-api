@@ -1,6 +1,6 @@
 # Health Record API
 
-A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent Events
+A simple CRUD API with Redis caching, RabbitMQ Queuing, Message broadcasting using Websocket and Server Sent Events
 
 ## Built with
 
@@ -47,7 +47,15 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
     TOKEN_SECRET=<secret>
    ```
 
-3. Run the server
+3. Setup Prisma Client
+
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev
+   npx prisma db push
+   ```
+
+4. Run the server
    ```bash
    docker-compose up health-record-api
    ```
@@ -66,7 +74,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
     "password": "pass#123"
   }
   ```
-- **CURL command** :
+- **`curl` command** :
   ```bash
   curl -X POST http://localhost:PORT/api/v1/auth/login \
   -H "Content-Type: application/json" \
@@ -85,7 +93,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
     "status": "Healthy"
   }
   ```
-- **CURL command** :
+- **`curl` command** :
   ```bash
   curl -X POST http://localhost:PORT/api/v1/records \
   -H "Content-Type: application/json" \
@@ -96,7 +104,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 
 - **URL** : `/api/v1/records/:id`
 - **Method** : `GET`
-- **CURL command** :
+- **`curl` command** :
   ```bash
   curl http://localhost:PORT/api/v1/records/{id}
   ```
@@ -111,7 +119,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
     "age": 20
   }
   ```
-- **CURL command** :
+- **`curl` command** :
   ```bash
   curl -X POST http://localhost:PORT/api/v1/records/{id} \
   -H "Content-Type: application/json" \
@@ -122,7 +130,7 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 
 - **URL** : `/api/v1/records/:id`
 - **Method** : `DELETE`
-- **CURL command** :
+- **`curl` command** :
   ```bash
   curl -X DELETE http://localhost:PORT/api/v1/records/{id}
   ```
@@ -132,14 +140,14 @@ A simple CRUD API with Redis caching, RabbitMQ Queue, Websocket and Server Sent 
 Connect to the websocket server
 
 - **Endpoint** : `http://localhost:PORT/ws`
-- Visit `https://hoppscotch.io/realtime/websocket` and add `ws://localhost:PORT/ws` as **URL** and hit connect
+- Use `https://hoppscotch.io/realtime/websocket` to test and add `ws://localhost:PORT/ws` as **URL** and hit connect
 
 ## Server Sent Events
 
 Connect to the SSE at
 
 - **Endpoint** : `http://localhost:PORT/sse/health-updates`
-- Use `CURL` to test 
+- Use `curl` to test
   ```bash
     curl http://localhost:PORT/sse/health-updates
   ```
@@ -150,8 +158,7 @@ An HTML file (`public/test.html`) is included to manually test all API endpoints
 
 ## Project structure & Architectural decisions
 
-- Organized the code into separates modules (models, controllers, routes etc)
-- Created a separate Notification worker to consume the messages from the queue, keeping the processes decoupled
-- Used docker to isolate environments for Node.js server, Redis, RabbitMQ and Worker, each run in their own   container
-
-
+- Organized the code into separates `modules` (models, controllers, routes etc).
+- Single server to handle `API`, `Websocket` and `SSE`.
+- Created a separate Notification worker to consume the messages from the queue, keeping the processes decoupled.
+- Used docker to isolate environments for `Node.js server`, `Redis`, `RabbitMQ` and `Worker`, each run in their own container.
